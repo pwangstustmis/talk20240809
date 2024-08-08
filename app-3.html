@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS 位置在 OpenStreetMap 上顯示</title>
+    <meta charset="UTF-8">
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // 初始化地圖
+        const map = L.map('map').setView([37.7749, -122.4194], 10);
+
+        // 添加 OpenStreetMap 圖層
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // 從 PHP 獲取數據
+        fetch('data.php')
+            .then(response => response.json())
+            .then(data => {
+                map.setView([data[0].latitude,data[0].longitude],17);
+                data.forEach(location => {
+                    L.marker([location.latitude, location.longitude])
+                        .addTo(map)
+                        .bindPopup(`<b>${location.description}</b>`)
+                        .openPopup();
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
